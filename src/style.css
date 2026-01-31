@@ -4,8 +4,36 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  
+  /* Semantic Color Variables */
+  --bg-color: #ffffff;
+  --text-main: #2c3e50;
+  --text-sub: #6c757d;
+  --text-dim: #666666;
+  --bg-panel: #f8f9fa;
+  --bg-card: #ffffff;
+  --border-color: #dee2e6;
+  --primary-color: #42b883;
+  --primary-text: #ffffff;
+  --secondary-bg: #6c757d;
+  --secondary-text: #ffffff;
+  --hover-bg: #f0fdf4;
+  --hover-border: #42b883;
+  --key-white-bg: #ffffff;
+  --key-white-text: #000000;
+  --key-black-bg: #333333;
+  --key-black-text: #ffffff;
+  --replay-btn-bg: #ffffff;
+  --replay-btn-hover: #eeeeee;
+  --replay-btn-border: #cccccc;
+  --shadow-color: rgba(0,0,0,0.1);
+
+  /* Button defaults */
+  --btn-default-bg: #1a1a1a;
+  --btn-default-text: #ffffff;
+
+  color: var(--text-main);
+  background-color: var(--bg-color);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -35,7 +63,8 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--btn-default-bg);
+  color: var(--btn-default-text);
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -47,12 +76,44 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #242424;
+    --text-main: rgba(255, 255, 255, 0.87);
+    --text-sub: rgba(255, 255, 255, 0.6);
+    --text-dim: rgba(255, 255, 255, 0.5);
+    --bg-panel: #2f2f2f;
+    --bg-card: #3a3a3a;
+    --border-color: #444444;
+    --primary-color: #42b883;
+    --primary-text: #ffffff;
+    --secondary-bg: #4a4a4a;
+    --secondary-text: #ffffff;
+    --hover-bg: #2f3e35;
+    --hover-border: #42b883;
+    
+    /* White keys in dark mode are light grey, so text MUST be black */
+    --key-white-bg: #e0e0e0;
+    --key-white-text: #000000;
+    
+    --key-black-bg: #111111;
+    --key-black-text: #eeeeee;
+    --replay-btn-bg: #3a3a3a;
+    --replay-btn-hover: #4a4a4a;
+    --replay-btn-border: #555555;
+    --shadow-color: rgba(0,0,0,0.5);
+    
+    --btn-default-bg: #1a1a1a;
+    --btn-default-text: #ffffff;
+  }
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
+    --btn-default-bg: #f9f9f9;
+    --btn-default-text: #213547;
   }
-  button {
-    background-color: #f9f9f9;
-  }
+  /* Remove the specific button override here, rely on vars */
 }
