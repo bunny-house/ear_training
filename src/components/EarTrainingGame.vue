@@ -2,19 +2,19 @@
   <div class="game-container">
     <div v-if="gameState === 'menu'" class="menu">
       <h1>Ear Training Game</h1>
-      <p>Select a Level</p>
+      <p>选择一个关卡</p>
       <div class="level-buttons">
         <button @click="selectLevel(1)" class="level-btn">
           <strong>Level 1</strong>
-          <span>C Major Scale (White Keys)</span>
+          <span>C大调 (白键)</span>
         </button>
         <button @click="selectLevel(2)" class="level-btn">
           <strong>Level 2</strong>
-          <span>Chromatic Scale (All Keys)</span>
+          <span>半音阶 (黑键+白键)</span>
         </button>
         <button @click="selectLevel(3)" class="level-btn">
           <strong>Level 3</strong>
-          <span>Movable Do (Relative Pitch)</span>
+          <span>首调听感 (移动调)</span>
         </button>
       </div>
     </div>
@@ -22,39 +22,36 @@
     <div v-else-if="gameState === 'start' || gameState === 'finished'" class="intro">
       <h1>Level {{ currentLevel }}</h1>
       <p v-if="gameState === 'start'">
-        Welcome! Listen to the reference tone (Do), then identify the played note.
+        欢迎！请先听参考音 (Do)，然后辨认播放的音符。
         <br>
-        <span class="sub-text">10 Rounds. +10 points for correct answer.</span>
+        <span class="sub-text">共10轮。每题10分。</span>
       </p>
       <div v-else class="game-over">
-        <h2>Game Over!</h2>
-        <div class="final-score">Final Score: {{ score }} / 100</div>
+        <h2>游戏结束！</h2>
+        <div class="final-score">最终得分: {{ score }} / 100</div>
       </div>
       
       <div class="action-buttons">
         <button @click="startGame" class="primary-btn">
-          {{ gameState === 'start' ? 'Start Game' : 'Play Again' }}
-        </button>
-        <button @click="gameState = 'menu'" class="secondary-btn">
-          Back to Menu
+          {{ gameState === 'start' ? '开始游戏' : '再玩一次' }}
         </button>
       </div>
     </div>
 
     <div v-else class="play-area">
       <div class="header">
-        <button @click="gameState = 'menu'" class="back-link">← Menu</button>
+        <button @click="gameState = 'menu'" class="back-link">← 返回菜单</button>
         <div class="stats">
           <span>Level {{ currentLevel }}</span>
-          <span>Round: {{ currentRound }} / 10</span>
-          <span>Score: {{ score }}</span>
+          <span>轮次: {{ currentRound }} / 10</span>
+          <span>得分: {{ score }}</span>
         </div>
       </div>
 
       <div class="status-box">
         <p class="status-text">{{ statusText }}</p>
         <button @click="playSequence" :disabled="isPlaying || gameState === 'feedback'" class="replay-btn">
-          🔊 Replay
+          🔊 重播
         </button>
       </div>
 
@@ -109,6 +106,7 @@ const currentLevel = ref(1);
 const currentRound = ref(1);
 const score = ref(0);
 const targetNote = ref(null);
+const lastTargetNote = ref(null);
 const selectedNote = ref(null);
 const isPlaying = ref(false);
 const statusText = ref('');
@@ -131,6 +129,7 @@ const selectLevel = (level) => {
   initAudio();
   currentLevel.value = level;
   gameState.value = 'start';
+  lastTargetNote.value = null; // Reset history
 };
 
 const startGame = () => {
@@ -144,33 +143,43 @@ const startGame = () => {
 
 const startRound = () => {
   selectedNote.value = null;
-  statusText.value = 'Get Ready...';
+  statusText.value = '准备好...';
   
   // Decide Root Freq for this round
   if (currentLevel.value === 3) {
     // Random root between C3 (130.81) and C5 (523.25)
-    // Actually, picking from standard semitones is nicer.
-    // Let's pick a random semitone offset from C3 (-12 to +12) or similar.
-    // For simplicity, let's range C3 to B4.
-    // C4 is 261.63. 
-    // Random factor between 0.75 (approx G3) and 1.5 (G4)
     const randomSemitones = Math.floor(Math.random() * 12) - 5; // -5 to +6 range around C4
     currentRootFreq.value = C4_FREQ * Math.pow(2, randomSemitones / 12);
   } else {
     currentRootFreq.value = C4_FREQ;
   }
 
-  let options = [];
-  if (currentLevel.value === 1) {
-    // Level 1: Random from based on Re, Mi, Fa, Sol, La, Si (2-7) for target
-    // Requirement says: "Play... based on this re, me, fa, so, la, si"
-    options = ['2', '3', '4', '5', '6', '7'];
-  } else {
-    // Level 2 & 3: All notes including sharps
-    options = notesConfig.map(n => n.val);
-  }
+  let newNote;
+  let searchLimit = 50;
+
+  do {
+    if (currentLevel.value === 1) {
+      // Level 1: Random from based on Re, Mi, Fa, Sol, La, Si (2-7) for target
+      const options = ['2', '3', '4', '5', '6', '7'];
+      newNote = options[Math.floor(Math.random() * options.length)];
+    } else {
+      // Level 2 & 3: 70% Black, 30% White
+      const blackNotes = notesConfig.filter(n => n.type === 'black').map(n => n.val);
+      const whiteNotes = notesConfig.filter(n => n.type === 'white').map(n => n.val);
+      
+      const useBlack = Math.random() < 0.7;
+      
+      if (useBlack) {
+        newNote = blackNotes[Math.floor(Math.random() * blackNotes.length)];
+      } else {
+        newNote = whiteNotes[Math.floor(Math.random() * whiteNotes.length)];
+      }
+    }
+    searchLimit--;
+  } while (newNote === lastTargetNote.value && searchLimit > 0);
   
-  targetNote.value = options[Math.floor(Math.random() * options.length)];
+  targetNote.value = newNote;
+  lastTargetNote.value = newNote;
   
   // Small delay before playing
   setTimeout(() => {
@@ -181,12 +190,9 @@ const startRound = () => {
 const playSequence = async () => {
   if (isPlaying.value) return;
   isPlaying.value = true;
-  statusText.value = 'Listening...';
+  statusText.value = '正在播放...';
 
-  // Play Reference (Do / ROOT) - ID is '1', but we use special 'ROOT' or just '1' if we want.
-  // Actually, '1' maps to 0 semitones, which is correct for Do.
-  // Using 'ROOT' constant logic in audio.js is also fine, but '1' works naturally with Movable Do logic.
-  // Let's use '1' (Do) explicitly.
+  // Play Reference (Do / ROOT)
   playNote('1', 0.8, currentRootFreq.value);
   
   // Wait
@@ -201,7 +207,7 @@ const playSequence = async () => {
   
   if (gameState.value !== 'feedback') {
     gameState.value = 'waiting_for_answer';
-    statusText.value = 'Select the note you heard';
+    statusText.value = '请选择你听到的音符';
   }
 };
 
@@ -213,10 +219,10 @@ const checkAnswer = (val) => {
   
   if (val === targetNote.value) {
     score.value += 10;
-    statusText.value = 'Correct! +10 points';
+    statusText.value = '回答正确！+10分';
   } else {
     const correctNote = notesConfig.find(n => n.val === targetNote.value);
-    statusText.value = `Wrong! It was ${correctNote.name}`;
+    statusText.value = `回答错误！正确答案是 ${correctNote.name}`;
   }
 
   // Next round
@@ -248,13 +254,16 @@ const checkAnswer = (val) => {
 }
 .level-buttons {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 20px;
   justify-content: center;
   margin-top: 30px;
 }
 .level-btn {
   padding: 20px;
-  width: 200px;
+  width: 100%;
+  max-width: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
