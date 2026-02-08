@@ -1,6 +1,6 @@
 <template>
   <div class="level-map">
-    <svg class="map-svg" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <svg class="map-svg" viewBox="0 0 600 900" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
       <!-- 绘制连线 -->
       <g class="connections">
         <!-- 0 -> 1 -->
@@ -114,7 +114,7 @@ const props = defineProps({
 
 const emit = defineEmits(['select']);
 
-// 节点位置配置（基于 600x800 的 SVG viewBox 坐标系）
+// 节点位置配置（基于 600x900 的 SVG viewBox 坐标系）
 // 百分比定位 + SVG viewBox 本身就是响应式的，容器缩放时自动等比适配
 // 0 -> 1
 // 1 -> 2 -> 3 -> 9 (左分支：旋律听写)
@@ -123,23 +123,23 @@ const emit = defineEmits(['select']);
 // 4 -> 5 -> 8 (右分支B)
 const nodePositions = {
   0: { x: 300, y: 60 },    // 起始
-  1: { x: 300, y: 160 },   // 分叉点1
+  1: { x: 300, y: 210 },   // 分叉点1
   
   // 左分支
-  2: { x: 120, y: 300 },
-  3: { x: 120, y: 440 },
-  9: { x: 120, y: 580 },   // 短旋律听写
+  2: { x: 170, y: 400 },
+  3: { x: 170, y: 580 },
+  9: { x: 170, y: 760 },   // 短旋律听写
   
   // 右分支起始
-  4: { x: 480, y: 300 },
+  4: { x: 430, y: 400 },
   
   // 右分支A (4->6->7)
-  6: { x: 380, y: 440 },
-  7: { x: 380, y: 580 },
+  6: { x: 350, y: 580 },
+  7: { x: 350, y: 760 },
   
   // 右分支B (4->5->8)
-  5: { x: 580, y: 440 },
-  8: { x: 580, y: 580 }
+  5: { x: 520, y: 580 },
+  8: { x: 520, y: 760 }
 };
 
 const getNodePosition = (levelId) => {
@@ -148,10 +148,10 @@ const getNodePosition = (levelId) => {
 
 const getNodeStyle = (levelId) => {
   const pos = getNodePosition(levelId);
-  // 将绝对坐标转换为百分比（基于 600x800 viewBox）
+  // 将绝对坐标转换为百分比（基于 600x900 viewBox）
   return {
     left: `${(pos.x / 600) * 100}%`,
-    top: `${(pos.y / 800) * 100}%`
+    top: `${(pos.y / 900) * 100}%`
   };
 };
 
@@ -178,15 +178,15 @@ const handleNodeClick = (levelId) => {
   width: 100%;
   max-width: 600px;
   margin: 10px auto;
-  aspect-ratio: 3 / 4;
-  min-height: 600px;
+  aspect-ratio: 2 / 3;
+  min-height: 700px;
 }
 
 /* 响应式 level-map 大小 */
 @media (max-width: 900px) {
   .level-map {
     max-width: 500px;
-    min-height: 550px;
+    min-height: 620px;
     margin: 8px auto;
   }
 }
@@ -194,7 +194,7 @@ const handleNodeClick = (levelId) => {
 @media (max-width: 600px) {
   .level-map {
     max-width: 100%;
-    min-height: 500px;
+    min-height: 560px;
     margin: 6px auto;
   }
 }
@@ -202,7 +202,7 @@ const handleNodeClick = (levelId) => {
 @media (max-width: 480px) {
   .level-map {
     max-width: 100%;
-    min-height: 450px;
+    min-height: 500px;
     margin: 4px auto;
   }
 }
