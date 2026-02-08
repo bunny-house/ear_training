@@ -104,7 +104,7 @@
 
 <script setup>
 import { ref, computed, onUnmounted } from 'vue';
-import { playNote, playNoteByFreq, initAudio, C4_FREQ } from '@/utils/audio';
+import { playNote, playNoteByFreq, initAudio, C4_FREQ } from '../utils/audio';
 import {
   LEVELS,
   getLevelConfig,
@@ -113,11 +113,11 @@ import {
   calculateScore,
   notesConfig,
   MELODIES
-} from '@/utils/levels';
+} from '../utils/levels';
 import {
   shuffle,
   selectRandom
-} from '@/utils/random';
+} from '../utils/random';
 import GameHeader from './GameHeader.vue';
 import NoteGrid from './NoteGrid.vue';
 import ReferenceToggle from './ReferenceToggle.vue';
