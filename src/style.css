@@ -56,6 +56,25 @@ body {
   text-align: center;
 }
 
+/* 响应式边距 */
+@media (max-width: 900px) {
+  #app {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  #app {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #app {
+    padding: 0.75rem;
+  }
+}
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;

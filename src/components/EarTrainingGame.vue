@@ -636,6 +636,25 @@ onUnmounted(() => {
   color: var(--text-main);
 }
 
+/* 响应式边距 */
+@media (max-width: 900px) {
+  .game-container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-container {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-container {
+    padding: 0px;
+  }
+}
+
 /* Menu */
 .menu {
   margin-top: 40px;
