@@ -5,74 +5,74 @@
       <g class="connections">
         <!-- 0 -> 1 -->
         <line
-          :x1="getScaledNodePosition(0).x"
-          :y1="getScaledNodePosition(0).y"
-          :x2="getScaledNodePosition(1).x"
-          :y2="getScaledNodePosition(1).y"
+          :x1="getNodePosition(0).x"
+          :y1="getNodePosition(0).y"
+          :x2="getNodePosition(1).x"
+          :y2="getNodePosition(1).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(1) }]"
         />
         <!-- 1 -> 2 -->
         <line
-          :x1="getScaledNodePosition(1).x"
-          :y1="getScaledNodePosition(1).y"
-          :x2="getScaledNodePosition(2).x"
-          :y2="getScaledNodePosition(2).y"
+          :x1="getNodePosition(1).x"
+          :y1="getNodePosition(1).y"
+          :x2="getNodePosition(2).x"
+          :y2="getNodePosition(2).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(2) }]"
         />
         <!-- 2 -> 3 -->
         <line
-          :x1="getScaledNodePosition(2).x"
-          :y1="getScaledNodePosition(2).y"
-          :x2="getScaledNodePosition(3).x"
-          :y2="getScaledNodePosition(3).y"
+          :x1="getNodePosition(2).x"
+          :y1="getNodePosition(2).y"
+          :x2="getNodePosition(3).x"
+          :y2="getNodePosition(3).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(3) }]"
         />
         <!-- 3 -> 9 -->
         <line
-          :x1="getScaledNodePosition(3).x"
-          :y1="getScaledNodePosition(3).y"
-          :x2="getScaledNodePosition(9).x"
-          :y2="getScaledNodePosition(9).y"
+          :x1="getNodePosition(3).x"
+          :y1="getNodePosition(3).y"
+          :x2="getNodePosition(9).x"
+          :y2="getNodePosition(9).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(9) }]"
         />
         <!-- 1 -> 4 -->
         <line
-          :x1="getScaledNodePosition(1).x"
-          :y1="getScaledNodePosition(1).y"
-          :x2="getScaledNodePosition(4).x"
-          :y2="getScaledNodePosition(4).y"
+          :x1="getNodePosition(1).x"
+          :y1="getNodePosition(1).y"
+          :x2="getNodePosition(4).x"
+          :y2="getNodePosition(4).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(4) }]"
         />
         <!-- 4 -> 6 -->
         <line
-          :x1="getScaledNodePosition(4).x"
-          :y1="getScaledNodePosition(4).y"
-          :x2="getScaledNodePosition(6).x"
-          :y2="getScaledNodePosition(6).y"
+          :x1="getNodePosition(4).x"
+          :y1="getNodePosition(4).y"
+          :x2="getNodePosition(6).x"
+          :y2="getNodePosition(6).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(6) }]"
         />
         <!-- 6 -> 7 -->
         <line
-          :x1="getScaledNodePosition(6).x"
-          :y1="getScaledNodePosition(6).y"
-          :x2="getScaledNodePosition(7).x"
-          :y2="getScaledNodePosition(7).y"
+          :x1="getNodePosition(6).x"
+          :y1="getNodePosition(6).y"
+          :x2="getNodePosition(7).x"
+          :y2="getNodePosition(7).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(7) }]"
         />
         <!-- 4 -> 5 -->
         <line
-          :x1="getScaledNodePosition(4).x"
-          :y1="getScaledNodePosition(4).y"
-          :x2="getScaledNodePosition(5).x"
-          :y2="getScaledNodePosition(5).y"
+          :x1="getNodePosition(4).x"
+          :y1="getNodePosition(4).y"
+          :x2="getNodePosition(5).x"
+          :y2="getNodePosition(5).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(5) }]"
         />
         <!-- 5 -> 8 -->
         <line
-          :x1="getScaledNodePosition(5).x"
-          :y1="getScaledNodePosition(5).y"
-          :x2="getScaledNodePosition(8).x"
-          :y2="getScaledNodePosition(8).y"
+          :x1="getNodePosition(5).x"
+          :y1="getNodePosition(5).y"
+          :x2="getNodePosition(8).x"
+          :y2="getNodePosition(8).y"
           :class="['connection-line', { 'unlocked-path': isUnlocked(8) }]"
         />
       </g>
@@ -103,7 +103,6 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { LEVELS } from '../utils/levels';
 
 const props = defineProps({
@@ -115,7 +114,8 @@ const props = defineProps({
 
 const emit = defineEmits(['select']);
 
-// 节点位置配置
+// 节点位置配置（基于 600x800 的 SVG viewBox 坐标系）
+// 百分比定位 + SVG viewBox 本身就是响应式的，容器缩放时自动等比适配
 // 0 -> 1
 // 1 -> 2 -> 3 -> 9 (左分支：旋律听写)
 // 1 -> 4 (右分支起始)
@@ -146,44 +146,9 @@ const getNodePosition = (levelId) => {
   return nodePositions[levelId] || { x: 0, y: 0 };
 };
 
-// 响应式窗口宽度
-const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1200);
-
-// 响应式缩放因子
-const scaleFactor = computed(() => {
-  const width = windowWidth.value;
-  if (width <= 600) return 0.75;  // 小屏幕缩小25%
-  if (width <= 900) return 0.85;  // 中等屏幕缩小15%
-  return 1;  // 大屏幕保持原样
-});
-
-// 获取缩放后的节点位置（用于 SVG 连线）
-const getScaledNodePosition = (levelId) => {
-  const pos = getNodePosition(levelId);
-  const scale = scaleFactor.value;
-  // 以中心点 (300, 60) 为基准进行缩放
-  return {
-    x: 300 + (pos.x - 300) * scale,
-    y: 60 + (pos.y - 60) * scale
-  };
-};
-
-// 监听窗口大小变化
-const handleResize = () => {
-  windowWidth.value = window.innerWidth;
-};
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
-});
-
 const getNodeStyle = (levelId) => {
-  const pos = getScaledNodePosition(levelId);
-  // 将绝对坐标转换为百分比（基于 600x800）
+  const pos = getNodePosition(levelId);
+  // 将绝对坐标转换为百分比（基于 600x800 viewBox）
   return {
     left: `${(pos.x / 600) * 100}%`,
     top: `${(pos.y / 800) * 100}%`
@@ -221,15 +186,15 @@ const handleNodeClick = (levelId) => {
 @media (max-width: 900px) {
   .level-map {
     max-width: 500px;
-    min-height: 500px;
+    min-height: 550px;
     margin: 8px auto;
   }
 }
 
 @media (max-width: 600px) {
   .level-map {
-    max-width: 400px;
-    min-height: 400px;
+    max-width: 100%;
+    min-height: 500px;
     margin: 6px auto;
   }
 }
@@ -237,7 +202,7 @@ const handleNodeClick = (levelId) => {
 @media (max-width: 480px) {
   .level-map {
     max-width: 100%;
-    min-height: 350px;
+    min-height: 450px;
     margin: 4px auto;
   }
 }

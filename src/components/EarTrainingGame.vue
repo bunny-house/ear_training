@@ -645,13 +645,13 @@ onUnmounted(() => {
 
 @media (max-width: 600px) {
   .game-container {
-    padding: 8px;
+    padding: 10px;
   }
 }
 
 @media (max-width: 480px) {
   .game-container {
-    padding: 0px;
+    padding: 8px;
   }
 }
 
